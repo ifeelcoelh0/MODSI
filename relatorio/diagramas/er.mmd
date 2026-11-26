@@ -1,0 +1,112 @@
+%% Modelo ER final (Mermaid) - igual à Figura 4.1 do relatório
+%% Pode ser aberto em https://mermaid.live ou no editor usado pelo grupo
+erDiagram
+    perfil ||--o{ utilizador : classifica
+    utilizador ||--o{ festival : organiza
+    utilizador ||--o{ festival_staff : trabalha_em
+    festival ||--o{ festival_staff : tem_staff
+    festival ||--o{ festival_artista : associa
+    artista ||--o{ festival_artista : participa
+    festival ||--o{ palco : tem
+    palco ||--o{ atuacao : acolhe
+    festival_artista ||--o{ atuacao : programa
+    utilizador ||--o{ inscricao : faz
+    festival ||--o{ inscricao : recebe
+    inscricao ||--o{ pagamento : tem
+    inscricao ||--o| bilhete : emite
+    bilhete ||--o| entrada : origina
+    utilizador ||--o{ entrada : valida
+
+    perfil {
+        VARCHAR(20) codigo PK
+        VARCHAR(100) descricao
+    }
+    utilizador {
+        BIGINT id_utilizador PK
+        VARCHAR(120) nome
+        VARCHAR(254) email UK
+        VARCHAR(255) password_hash
+        VARCHAR(20) perfil_codigo FK
+        CHAR(2) idioma
+        BOOLEAN ativo
+        DATETIME criado_em
+    }
+    festival {
+        BIGINT id_festival PK
+        BIGINT id_organizador FK
+        VARCHAR(160) nome
+        TEXT descricao
+        VARCHAR(200) localizacao
+        DATE data_inicio
+        DATE data_fim
+        DATETIME inscricoes_abrem
+        DATETIME inscricoes_fecham
+        DATETIME cancelamento_ate
+        INT capacidade
+        DECIMAL(10_2) preco
+        ENUM estado "rascunho|publicado|cancelado|terminado"
+        BOOLEAN ativo "gerido pelo Admin"
+        DATETIME criado_em
+    }
+    festival_staff {
+        BIGINT id_festival PK,FK
+        BIGINT id_utilizador PK,FK
+        DATETIME associado_em
+        BOOLEAN ativo
+    }
+    artista {
+        BIGINT id_artista PK
+        VARCHAR(160) nome
+        VARCHAR(80) genero
+        TEXT biografia
+    }
+    festival_artista {
+        BIGINT id_festival PK,FK
+        BIGINT id_artista PK,FK
+    }
+    palco {
+        BIGINT id_palco PK
+        BIGINT id_festival FK
+        VARCHAR(100) nome "UK com id_festival"
+    }
+    atuacao {
+        BIGINT id_atuacao PK
+        BIGINT id_festival FK
+        BIGINT id_palco FK "FK (id_palco,id_festival) -> palco"
+        BIGINT id_artista FK "FK (id_festival,id_artista) -> festival_artista"
+        DATETIME inicio
+        DATETIME fim
+    }
+    inscricao {
+        BIGINT id_inscricao PK
+        BIGINT id_participante FK
+        BIGINT id_festival FK
+        ENUM estado "pendente|confirmada|cancelada"
+        DECIMAL(10_2) valor
+        DATETIME criada_em
+        DATETIME confirmada_em
+        DATETIME cancelada_em
+        BIGINT id_festival_ativa UK "gerada: id_festival se não cancelada; UK com id_participante"
+    }
+    pagamento {
+        BIGINT id_pagamento PK
+        BIGINT id_inscricao FK
+        ENUM metodo "cartao|mbway|multibanco"
+        ENUM resultado "aprovado|recusado"
+        DECIMAL(10_2) valor
+        DATETIME criado_em
+        BIGINT inscricao_aprovada UK "gerada: id_inscricao se aprovado"
+    }
+    bilhete {
+        BIGINT id_bilhete PK
+        BIGINT id_inscricao FK,UK
+        CHAR(64) codigo_qr UK
+        DATETIME emitido_em
+        DATETIME revogado_em
+    }
+    entrada {
+        BIGINT id_entrada PK
+        BIGINT id_bilhete FK,UK
+        BIGINT id_staff FK
+        DATETIME validada_em
+    }

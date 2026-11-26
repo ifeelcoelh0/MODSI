@@ -1,0 +1,571 @@
+\chapter{Modelação do Sistema}
+\label{cap:modelacao}
+
+\section{Tabela de Casos de Uso}
+
+A Tabela~\ref{tab:uc} identifica os 31 casos de uso, o ator principal, os
+requisitos funcionais que concretizam e as relações
+\incl{} e \extd{} entre casos de uso. Cada ator concreto tem pelo menos cinco
+casos de uso próprios. Os casos UC07 a UC09 são comuns a todos os
+utilizadores autenticados e são herdados através da generalização.
+
+\begin{longtable}{|l|p{5.6cm}|l|l|p{2.6cm}|}
+\caption{Casos de uso do sistema}\label{tab:uc}\\
+\hline
+\textbf{UC} & \textbf{Caso de uso} & \textbf{Ator} & \textbf{RF} & \textbf{Relações} \\ \hline
+\endfirsthead
+\hline
+\textbf{UC} & \textbf{Caso de uso (cont.)} & \textbf{Ator} & \textbf{RF} & \textbf{Relações} \\ \hline
+\endhead
+UC01 & Consultar lista de festivais & Visitante & RF01 & -- \\ \hline
+UC02 & Pesquisar festivais pelo nome & Visitante & RF02 & \extd{} UC01 \\ \hline
+UC03 & Filtrar festivais por data ou localização & Visitante & RF02 & \extd{} UC01 \\ \hline
+UC04 & Consultar detalhes de um festival & Visitante & RF03 & -- \\ \hline
+UC05 & Consultar programação, palcos e artistas & Visitante & RF03 & \extd{} UC04 \\ \hline
+UC06 & Registar conta & Visitante & RF04 & -- \\ \hline
+UC07 & Iniciar sessão & Util. Autent. & RF05 & -- \\ \hline
+UC08 & Terminar sessão & Util. Autent. & RF05 & -- \\ \hline
+UC09 & Editar perfil (dados, palavra-passe, idioma) & Util. Autent. & RF06 & -- \\ \hline
+UC10 & Inscrever-se num festival & Participante & RF07 & -- \\ \hline
+UC11 & Efetuar pagamento simulado & Participante & RF08, RF09 & \extd{} UC10, UC12 \\ \hline
+UC12 & Consultar as minhas inscrições & Participante & RF10 & -- \\ \hline
+UC13 & Consultar bilhete QR & Participante & RF09 & \extd{} UC12 \\ \hline
+UC14 & Cancelar inscrição & Participante & RF11 & \extd{} UC12 \\ \hline
+UC15 & Criar festival & Organizador & RF12 & -- \\ \hline
+UC16 & Editar festival e alterar estado & Organizador & RF12, RF13 & -- \\ \hline
+UC17 & Gerir palcos & Organizador & RF14 & -- \\ \hline
+UC18 & Gerir artistas do festival & Organizador & RF15 & -- \\ \hline
+UC19 & Gerir programação (atuações) & Organizador & RF16 & -- \\ \hline
+UC20 & Gerir Staff do festival & Organizador & RF17 & -- \\ \hline
+UC21 & Consultar inscrições do festival & Organizador & RF18 & -- \\ \hline
+UC22 & Consultar festivais associados & Staff & RF19 & -- \\ \hline
+UC23 & Consultar participantes inscritos & Staff & RF20 & -- \\ \hline
+UC24 & Verificar bilhete & Staff & RF21 & -- \\ \hline
+UC25 & Validar entrada & Staff & RF22 & \incl{} UC24 \\ \hline
+UC26 & Consultar histórico de entradas & Staff & RF23 & -- \\ \hline
+UC27 & Gerir contas de utilizador & Administrador & RF24 & -- \\ \hline
+UC28 & Atribuir perfil & Administrador & RF25 & \extd{} UC27 \\ \hline
+UC29 & Consultar todos os festivais & Administrador & RF26 & -- \\ \hline
+UC30 & Ativar ou desativar festival & Administrador & RF26 & \extd{} UC29 \\ \hline
+UC31 & Consultar indicadores globais & Administrador & RF27 & -- \\ \hline
+\end{longtable}
+
+% =====================================================================
+\section{Diagramas de Casos de Uso}
+
+Para manter a legibilidade, o diagrama de casos de uso é apresentado por ator.
+A Figura~\ref{fig:uc-geral} mostra a generalização dos atores autenticados e os
+casos de uso comuns. As Figuras~\ref{fig:uc-visitante} a~\ref{fig:uc-admin}
+mostram os casos de uso de cada ator.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.9\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{par}{0,5.7}{Participante}
+  \ator{org}{0,3.8}{Organizador}
+  \ator{stf}{0,1.9}{Staff}
+  \ator{adm}{0,0}{Administrador}
+  \ator{ua}{3.6,2.85}{\emph{Utilizador}\\\emph{Autenticado}}
+  \draw[general] (par) -- (ua-left);
+  \draw[general] (org) -- (ua-left);
+  \draw[general] (stf) -- (ua-left);
+  \draw[general] (adm) -- (ua-left);
+  \draw[sistema] (5.6,-0.6) rectangle (12.4,5.6);
+  \node[font=\small\bfseries] at (9,5.2) {Sistema de Gestão de Festivais};
+  \node[uc] (uc07) at (9,4.0) {UC07 Iniciar sessão};
+  \node[uc] (uc08) at (9,2.6) {UC08 Terminar sessão};
+  \node[uc] (uc09) at (9,1.2) {UC09 Editar perfil};
+  \draw[assoc] (ua) -- (uc07.west);
+  \draw[assoc] (ua) -- (uc08.west);
+  \draw[assoc] (ua) -- (uc09.west);
+\end{tikzpicture}}
+\caption{Generalização dos atores autenticados e casos de uso comuns}
+\label{fig:uc-geral}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{vis}{0,2.4}{Visitante}
+  \draw[sistema] (2.4,-2.4) rectangle (11.4,7.4);
+  \node[font=\small\bfseries] at (6.9,7.0) {Sistema de Gestão de Festivais};
+  \node[uc] (uc01) at (5.6,6.0)  {UC01 Consultar lista de festivais};
+  \node[uc] (uc02) at (5.6,4.5)  {UC02 Pesquisar festivais pelo nome};
+  \node[uc] (uc03) at (5.6,3.0)  {UC03 Filtrar por data ou localização};
+  \node[uc] (uc04) at (5.6,1.5)  {UC04 Consultar detalhes do festival};
+  \node[uc] (uc05) at (5.6,0.0)  {UC05 Consultar programação,\\palcos e artistas};
+  \node[uc] (uc06) at (5.6,-1.5) {UC06 Registar conta};
+  \draw[assoc] (vis) -- (uc01.west);
+  \draw[assoc] (vis) -- (uc04.west);
+  \draw[assoc] (vis) -- (uc06.west);
+  \draw[relacao] (uc02.north) -- node[relnome]{\extd} (uc01.south);
+  \draw[relacao] (uc03.east) to[out=0,in=0,looseness=1.4]
+        node[relnome]{\extd} (uc01.east);
+  \draw[relacao] (uc05.north) -- node[relnome]{\extd} (uc04.south);
+\end{tikzpicture}}
+\caption{Casos de uso do Visitante}
+\label{fig:uc-visitante}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{par}{0,2.4}{Participante}
+  \draw[sistema] (2.4,-0.9) rectangle (11.4,7.4);
+  \node[font=\small\bfseries] at (6.9,7.0) {Sistema de Gestão de Festivais};
+  \node[uc] (uc10) at (5.6,6.0) {UC10 Inscrever-se num festival};
+  \node[uc] (uc11) at (5.6,4.5) {UC11 Efetuar pagamento simulado};
+  \node[uc] (uc12) at (5.6,3.0) {UC12 Consultar as minhas inscrições};
+  \node[uc] (uc13) at (5.6,1.5) {UC13 Consultar bilhete QR};
+  \node[uc] (uc14) at (5.6,0.0) {UC14 Cancelar inscrição};
+  \draw[assoc] (par) -- (uc10.west);
+  \draw[assoc] (par) -- (uc12.west);
+  \draw[relacao] (uc11.north) -- node[relnome]{\extd} (uc10.south);
+  \draw[relacao] (uc11.south) -- node[relnome]{\extd} (uc12.north);
+  \draw[relacao] (uc13.north) -- node[relnome]{\extd} (uc12.south);
+  \draw[relacao] (uc14.east) to[out=0,in=0,looseness=1.4]
+        node[relnome]{\extd} (uc12.east);
+\end{tikzpicture}}
+\caption{Casos de uso do Participante}
+\label{fig:uc-participante}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{org}{0,3.5}{Organizador}
+  \draw[sistema] (2.4,-0.8) rectangle (11.4,8.6);
+  \node[font=\small\bfseries] at (6.9,8.2) {Sistema de Gestão de Festivais};
+  \node[uc] (uc15) at (6.9,7.2) {UC15 Criar festival};
+  \node[uc] (uc16) at (6.9,6.0) {UC16 Editar festival e alterar estado};
+  \node[uc] (uc17) at (6.9,4.8) {UC17 Gerir palcos};
+  \node[uc] (uc18) at (6.9,3.6) {UC18 Gerir artistas do festival};
+  \node[uc] (uc19) at (6.9,2.4) {UC19 Gerir programação};
+  \node[uc] (uc20) at (6.9,1.2) {UC20 Gerir Staff do festival};
+  \node[uc] (uc21) at (6.9,0.0) {UC21 Consultar inscrições do festival};
+  \foreach \x in {uc15,uc16,uc17,uc18,uc19,uc20,uc21}
+    \draw[assoc] (org) -- (\x.west);
+\end{tikzpicture}}
+\caption{Casos de uso do Organizador}
+\label{fig:uc-organizador}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{stf}{0,2.4}{Staff}
+  \draw[sistema] (2.4,-0.9) rectangle (11.4,7.4);
+  \node[font=\small\bfseries] at (6.9,7.0) {Sistema de Gestão de Festivais};
+  \node[uc] (uc22) at (5.6,6.0) {UC22 Consultar festivais associados};
+  \node[uc] (uc23) at (5.6,4.5) {UC23 Consultar participantes inscritos};
+  \node[uc] (uc25) at (5.6,3.0) {UC25 Validar entrada};
+  \node[uc] (uc24) at (5.6,1.5) {UC24 Verificar bilhete (QR ou código)};
+  \node[uc] (uc26) at (5.6,0.0) {UC26 Consultar histórico de entradas};
+  \foreach \x in {uc22,uc23,uc25,uc24,uc26}
+    \draw[assoc] (stf) -- (\x.west);
+  \draw[relacao] (uc25.south) -- node[relnome]{\incl} (uc24.north);
+\end{tikzpicture}}
+\caption{Casos de uso do Staff}
+\label{fig:uc-staff}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.85\textwidth}{!}{%
+\begin{tikzpicture}
+  \ator{adm}{0,2.4}{Administrador}
+  \draw[sistema] (2.4,-0.9) rectangle (11.4,7.4);
+  \node[font=\small\bfseries] at (6.9,7.0) {Sistema de Gestão de Festivais};
+  \node[uc] (uc27) at (5.6,6.0) {UC27 Gerir contas de utilizador};
+  \node[uc] (uc28) at (5.6,4.5) {UC28 Atribuir perfil};
+  \node[uc] (uc29) at (5.6,3.0) {UC29 Consultar todos os festivais};
+  \node[uc] (uc30) at (5.6,1.5) {UC30 Ativar ou desativar festival};
+  \node[uc] (uc31) at (5.6,0.0) {UC31 Consultar indicadores globais};
+  \draw[assoc] (adm) -- (uc27.west);
+  \draw[assoc] (adm) -- (uc29.west);
+  \draw[assoc] (adm) -- (uc31.west);
+  \draw[relacao] (uc28.north) -- node[relnome]{\extd} (uc27.south);
+  \draw[relacao] (uc30.north) -- node[relnome]{\extd} (uc29.south);
+\end{tikzpicture}}
+\caption{Casos de uso do Administrador}
+\label{fig:uc-admin}
+\end{figure}
+
+% =====================================================================
+\section{Descrição de Cenários}
+
+Cada caso de uso é descrito pela pré-condição, pelo fluxo principal, pela
+pós-condição e pelos fluxos alternativos. As referências RNxx remetem para as
+regras de negócio da Secção~\ref{sec:regras}.
+
+\subsection{Visitante}
+
+\cenario{UC01}{Consultar lista de festivais}{Visitante}
+{Nenhuma.}
+{1.~O visitante acede à página inicial ou ao menu \emph{Festivais}.\newline
+ 2.~O sistema apresenta, com paginação, os festivais publicados e ativos
+ (RN03), com nome, localização, datas e preço.}
+{Lista de festivais apresentada.}
+{Não existem festivais disponíveis: o sistema informa o visitante.}
+
+\cenario{UC02}{Pesquisar festivais pelo nome}{Visitante}
+{Lista de festivais apresentada (UC01).}
+{1.~O visitante escreve parte do nome no campo de pesquisa.\newline
+ 2.~O sistema atualiza a lista por AJAX à medida que o texto é escrito.}
+{Lista restrita aos festivais cujo nome contém o texto.}
+{Nenhum festival corresponde à pesquisa: o sistema mostra uma mensagem.}
+
+\cenario{UC03}{Filtrar festivais por data ou localização}{Visitante}
+{Lista de festivais apresentada (UC01).}
+{1.~O visitante indica um intervalo de datas e/ou uma localização.\newline
+ 2.~O sistema atualiza a lista com os festivais que decorrem nesse intervalo
+ e/ou local.}
+{Lista filtrada apresentada.}
+{Data final anterior à inicial: o sistema indica o erro.
+ Nenhum resultado: o sistema mostra uma mensagem.}
+
+\cenario{UC04}{Consultar detalhes de um festival}{Visitante}
+{O festival está publicado e ativo.}
+{1.~O visitante seleciona um festival na lista.\newline
+ 2.~O sistema apresenta a descrição, localização, datas, preço, período de
+ inscrições, lugares disponíveis e a opção \emph{Inscrever}.}
+{Detalhes do festival apresentados.}
+{O festival deixou de estar disponível: o sistema informa e volta à lista.}
+
+\cenario{UC05}{Consultar programação, palcos e artistas}{Visitante}
+{Detalhes do festival apresentados (UC04).}
+{1.~O visitante abre o separador \emph{Programação}.\newline
+ 2.~O sistema apresenta as atuações agrupadas por dia e por palco, com
+ artista e horário.\newline
+ 3.~O visitante pode selecionar um artista para ver o género e a biografia.}
+{Programação apresentada.}
+{Programação ainda não definida: o sistema mostra ``Programação em breve''.}
+
+\cenario{UC06}{Registar conta}{Visitante}
+{O visitante não tem sessão iniciada.}
+{1.~O visitante preenche nome, email, palavra-passe e confirmação.\newline
+ 2.~O sistema valida os dados e a unicidade do email.\newline
+ 3.~O sistema cria a conta com perfil Participante (RN01), guarda apenas o
+ \emph{hash} da palavra-passe e inicia sessão.}
+{Conta ativa com perfil Participante; sessão iniciada.}
+{Email já registado, dados inválidos ou palavras-passe diferentes: o sistema
+ assinala os campos com erro e não cria a conta.}
+
+\subsection{Utilizador Autenticado}
+
+\cenario{UC07}{Iniciar sessão}{Utilizador Autenticado (qualquer perfil)}
+{O utilizador tem uma conta registada.}
+{1.~O utilizador introduz email e palavra-passe.\newline
+ 2.~O sistema verifica a palavra-passe contra o \emph{hash} guardado e o
+ estado da conta.\newline
+ 3.~O sistema cria a sessão e redireciona para a área do respetivo perfil.}
+{Sessão iniciada com as permissões do perfil.}
+{Credenciais inválidas: mensagem genérica, sem indicar qual o campo errado.
+ Conta desativada (RN02): acesso recusado.}
+
+\cenario{UC08}{Terminar sessão}{Utilizador Autenticado (qualquer perfil)}
+{Sessão iniciada.}
+{1.~O utilizador seleciona \emph{Sair}.\newline
+ 2.~O sistema destrói a sessão e apresenta a página inicial.}
+{Sessão terminada.}
+{A sessão já tinha expirado: o sistema apresenta a página inicial.}
+
+\cenario{UC09}{Editar perfil}{Utilizador Autenticado (qualquer perfil)}
+{Sessão iniciada.}
+{1.~O utilizador abre \emph{O meu perfil}.\newline
+ 2.~Altera o nome, o idioma preferido ou a palavra-passe (indicando a
+ atual).\newline
+ 3.~O sistema valida e guarda as alterações.}
+{Dados atualizados; a interface passa a usar o idioma escolhido.}
+{Palavra-passe atual incorreta ou nova palavra-passe inválida: alteração
+ recusada.}
+
+\subsection{Participante}
+
+\cenario{UC10}{Inscrever-se num festival}{Participante}
+{Participante autenticado; festival publicado, ativo, com inscrições abertas e
+ lugares disponíveis (RN05).}
+{1.~No detalhe do festival, o participante seleciona \emph{Inscrever}.\newline
+ 2.~O sistema apresenta o resumo e o valor a pagar.\newline
+ 3.~O participante confirma.\newline
+ 4.~O sistema cria a inscrição no estado \emph{pendente}, com o valor igual ao
+ preço atual (RN07), e propõe o pagamento (UC11).}
+{Inscrição pendente de pagamento.}
+{Inscrições fechadas ou lotação esgotada: inscrição recusada.
+ Já existe inscrição pendente ou confirmada (RN06): o sistema mostra a
+ inscrição existente.
+ Inscrição anterior cancelada: é criada uma nova inscrição e a anterior
+ fica no histórico.}
+
+\cenario{UC11}{Efetuar pagamento simulado}{Participante}
+{Existe uma inscrição pendente do participante.}
+{1.~O participante escolhe o método (cartão, MB WAY ou referência
+ Multibanco, todos simulados) e confirma.\newline
+ 2.~O sistema regista a tentativa de pagamento e o resultado.\newline
+ 3.~Se o pagamento é aprovado, o sistema, numa única transação, confirma a
+ inscrição e emite o bilhete com código QR único (RN08, RN09).}
+{Pagamento aprovado, inscrição confirmada e bilhete emitido.}
+{Pagamento recusado: a tentativa fica registada, a inscrição continua
+ pendente e o participante pode tentar de novo.
+ A lotação esgotou entretanto: o pagamento não é processado e o participante
+ é informado.}
+
+\cenario{UC12}{Consultar as minhas inscrições}{Participante}
+{Participante autenticado.}
+{1.~O participante abre \emph{As minhas inscrições}.\newline
+ 2.~O sistema lista as inscrições com festival, datas, valor e estado.\newline
+ 3.~Em cada inscrição, o participante pode pagar (UC11), ver o bilhete (UC13)
+ ou cancelar (UC14), conforme o estado.}
+{Lista de inscrições apresentada.}
+{Não existem inscrições: o sistema sugere a lista de festivais.}
+
+\cenario{UC13}{Consultar bilhete QR}{Participante}
+{Inscrição confirmada com bilhete não revogado.}
+{1.~O participante seleciona \emph{Ver bilhete}.\newline
+ 2.~O sistema apresenta o código QR, o código manual, o nome do participante
+ e os dados do festival, com opção de impressão.}
+{Bilhete apresentado.}
+{Inscrição pendente ou cancelada: o bilhete não está disponível.}
+
+\cenario{UC14}{Cancelar inscrição}{Participante}
+{Inscrição pendente ou confirmada, dentro do prazo de cancelamento e sem
+ entrada registada (RN10).}
+{1.~O participante seleciona \emph{Cancelar} e o sistema pede
+ confirmação.\newline
+ 2.~O participante confirma.\newline
+ 3.~O sistema, numa transação, passa a inscrição a \emph{cancelada}, regista a
+ data e revoga o bilhete, se existir.}
+{Inscrição cancelada, bilhete revogado e lugar libertado.}
+{Prazo ultrapassado ou entrada já registada: cancelamento recusado.
+ O participante desiste na confirmação: nada é alterado.}
+
+\subsection{Organizador}
+
+\cenario{UC15}{Criar festival}{Organizador}
+{Sessão iniciada com perfil Organizador.}
+{1.~O organizador seleciona \emph{Novo festival}.\newline
+ 2.~Introduz nome, descrição, localização, datas de início e fim, período
+ de inscrições, data limite de cancelamento, capacidade e preço.\newline
+ 3.~O sistema valida os dados e cria o festival no estado \emph{rascunho},
+ tendo o organizador como responsável.}
+{Festival criado em rascunho, ainda não visível ao público.}
+{Dados em falta ou incoerentes (fim antes do início, fecho das inscrições
+ depois do fim do festival, capacidade ou preço negativos): o sistema
+ assinala os erros.}
+
+\cenario{UC16}{Editar festival e alterar estado}{Organizador}
+{O organizador é o responsável pelo festival (RN04).}
+{1.~O organizador abre o festival e altera os dados, ou\newline
+ 2.~altera o estado: publicar (rascunho para publicado), cancelar ou
+ terminar.\newline
+ 3.~O sistema valida e guarda.}
+{Dados ou estado do festival atualizados.}
+{Capacidade inferior ao número de inscrições confirmadas: alteração recusada.
+ Festival cancelado ou terminado: não pode ser editado.
+ Festival desativado pelo Administrador: pode ser publicado mas continua
+ invisível até ser reativado (RN03).}
+
+\cenario{UC17}{Gerir palcos}{Organizador}
+{O organizador é o responsável pelo festival.}
+{1.~O organizador abre a lista de palcos do festival.\newline
+ 2.~Adiciona, renomeia ou remove um palco.\newline
+ 3.~O sistema valida e guarda.}
+{Palcos do festival atualizados.}
+{Nome repetido no mesmo festival: recusado.
+ Palco com atuações marcadas (RN14): remoção recusada.}
+
+\cenario{UC18}{Gerir artistas do festival}{Organizador}
+{O organizador é o responsável pelo festival.}
+{1.~O organizador pesquisa um artista no catálogo ou cria um novo (nome,
+ género e biografia).\newline
+ 2.~Associa o artista ao festival ou remove a associação.\newline
+ 3.~O sistema guarda as alterações.}
+{Lista de artistas do festival atualizada.}
+{Artista já associado: o sistema informa.
+ Artista com atuações marcadas no festival (RN14): remoção recusada.}
+
+\cenario{UC19}{Gerir programação}{Organizador}
+{O organizador é o responsável pelo festival, que tem pelo menos um palco e um
+ artista associado.}
+{1.~O organizador seleciona \emph{Nova atuação}.\newline
+ 2.~Escolhe o artista, o palco, a data e hora de início e de fim.\newline
+ 3.~O sistema valida a atuação (RN13) e guarda. As atuações existentes podem
+ ser editadas ou removidas.}
+{Programação atualizada; visível ao público se o festival estiver publicado.}
+{Sobreposição com outra atuação no mesmo palco, horário fora das datas do
+ festival ou fim anterior ao início: o sistema recusa e indica o motivo.}
+
+\cenario{UC20}{Gerir Staff do festival}{Organizador}
+{O organizador é o responsável pelo festival.}
+{1.~O organizador pesquisa utilizadores com perfil Staff por nome ou
+ email.\newline
+ 2.~Associa o utilizador ao festival, ou remove uma associação existente.\newline
+ 3.~O sistema guarda; a remoção desativa a associação (RN12).}
+{Lista de Staff do festival atualizada.}
+{Utilizador inexistente ou sem perfil Staff: recusado.
+ Associação já ativa: o sistema informa.
+ Associação inativa: é reativada.}
+
+\cenario{UC21}{Consultar inscrições do festival}{Organizador}
+{O organizador é o responsável pelo festival.}
+{1.~O organizador abre o separador \emph{Inscrições}.\newline
+ 2.~O sistema lista os participantes, o estado e o valor de cada inscrição,
+ com filtro por estado.\newline
+ 3.~O sistema apresenta indicadores: inscrições confirmadas, ocupação face à
+ capacidade, receita simulada e gráfico de inscrições por dia.}
+{Inscrições e indicadores apresentados.}
+{Não existem inscrições: o sistema informa.}
+
+\subsection{Staff}
+
+\cenario{UC22}{Consultar festivais associados}{Staff}
+{Sessão iniciada com perfil Staff.}
+{1.~O sistema lista os festivais com associação ativa, destacando os que
+ decorrem no próprio dia.\newline
+ 2.~O membro do Staff seleciona o festival em que vai trabalhar.}
+{Festival selecionado para as operações seguintes.}
+{Não existem associações ativas: o sistema informa.}
+
+\cenario{UC23}{Consultar participantes inscritos}{Staff}
+{Membro do Staff associado ao festival (RN12).}
+{1.~O sistema lista os participantes com inscrição confirmada.\newline
+ 2.~O membro do Staff pesquisa por nome, email ou código do bilhete.\newline
+ 3.~Para cada participante, o sistema indica se a entrada já foi registada.}
+{Lista de participantes apresentada.}
+{Participante não encontrado: o sistema informa.}
+
+\cenario{UC24}{Verificar bilhete}{Staff}
+{Membro do Staff associado ao festival selecionado.}
+{1.~O membro do Staff lê o código QR com a câmara ou introduz o código
+ manual.\newline
+ 2.~O sistema verifica o bilhete por AJAX (RN11) e apresenta o resultado
+ (válido ou inválido, com o motivo) e o nome do participante.}
+{Resultado apresentado; nada é registado.}
+{Código inexistente, bilhete de outro festival, bilhete revogado, festival
+ que não decorre nesse dia ou bilhete já utilizado (com data e hora da
+ entrada anterior): o bilhete é indicado como inválido.}
+
+\cenario{UC25}{Validar entrada}{Staff}
+{Membro do Staff associado ao festival selecionado.}
+{1.~O sistema verifica o bilhete (\incl{} UC24).\newline
+ 2.~Se o bilhete é válido, o membro do Staff confirma a entrada.\newline
+ 3.~O sistema regista a entrada (bilhete, membro do Staff, data e hora).}
+{Entrada registada; o bilhete fica utilizado.}
+{Bilhete inválido: entrada recusada com o motivo.
+ Leitura simultânea do mesmo bilhete noutro posto: a restrição de unicidade
+ da base de dados rejeita o segundo registo e o sistema indica ``bilhete já
+ utilizado''.}
+
+\cenario{UC26}{Consultar histórico de entradas}{Staff}
+{Membro do Staff associado ao festival.}
+{1.~O sistema lista as entradas do festival com data e hora, participante e
+ membro do Staff que validou.\newline
+ 2.~O sistema mostra o total de entradas face ao total de inscrições
+ confirmadas.}
+{Histórico apresentado.}
+{Não existem entradas registadas: o sistema informa.}
+
+\subsection{Administrador}
+
+\cenario{UC27}{Gerir contas de utilizador}{Administrador}
+{Sessão iniciada com perfil Administrador.}
+{1.~O sistema lista os utilizadores, com pesquisa e filtros por perfil e
+ estado.\newline
+ 2.~O administrador cria uma conta, edita dados, ativa ou desativa uma
+ conta.\newline
+ 3.~O sistema valida e guarda.}
+{Contas atualizadas.}
+{Email já usado por outra conta: recusado.
+ O administrador tenta desativar a própria conta: recusado.}
+
+\cenario{UC28}{Atribuir perfil}{Administrador}
+{Conta selecionada em UC27.}
+{1.~O administrador escolhe o novo perfil e confirma.\newline
+ 2.~O sistema atualiza o perfil da conta.}
+{Perfil alterado; as novas permissões aplicam-se na operação seguinte do
+ utilizador.}
+{Retirar o perfil Organizador a quem tem festivais publicados, ou retirar o
+ perfil Administrador ao último administrador: recusado.
+ Retirar o perfil Staff: as associações a festivais são desativadas.}
+
+\cenario{UC29}{Consultar todos os festivais}{Administrador}
+{Sessão iniciada com perfil Administrador.}
+{1.~O sistema lista todos os festivais, em qualquer estado, com organizador,
+ estado, indicador ativo e número de inscrições.\newline
+ 2.~O administrador pode filtrar por estado ou organizador.}
+{Lista apresentada.}
+{Não existem festivais: o sistema informa.}
+
+\cenario{UC30}{Ativar ou desativar festival}{Administrador}
+{Festival selecionado em UC29.}
+{1.~O administrador seleciona \emph{Desativar} (ou \emph{Ativar}) e
+ confirma.\newline
+ 2.~O sistema atualiza o indicador ativo do festival.}
+{Um festival desativado deixa de ser visível e de aceitar inscrições (RN03);
+ as inscrições existentes mantêm-se.}
+{O administrador desiste na confirmação: nada é alterado.}
+
+\cenario{UC31}{Consultar indicadores globais}{Administrador}
+{Sessão iniciada com perfil Administrador.}
+{1.~O administrador abre o \emph{dashboard} e escolhe um período.\newline
+ 2.~O sistema apresenta, com gráficos: utilizadores por perfil, festivais por
+ estado, inscrições por estado, pagamentos aprovados e recusados e receita
+ simulada.}
+{Indicadores apresentados.}
+{Não existem dados no período: o sistema informa.}
+
+% =====================================================================
+\section{Diagramas de Estados}
+
+Os diagramas de estados das Figuras~\ref{fig:estados-inscricao}
+e~\ref{fig:estados-festival} resumem o ciclo de vida das duas entidades
+centrais e correspondem às colunas \texttt{estado} das tabelas
+\texttt{inscricao} e \texttt{festival}.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}
+  \fill (0,0) circle (0.13);
+  \node[estado] (pen) at (3,0)  {pendente};
+  \node[estado] (con) at (10,0) {confirmada};
+  \node[estado] (can) at (6.5,-3.2) {cancelada};
+  \draw[trans] (0.13,0) -- node[translab,above]{inscrever} (pen);
+  \draw[trans] (pen) -- node[translab,above]{pagamento aprovado\\/ emite bilhete} (con);
+  \draw[trans] (pen.north west) .. controls +(-0.4,1.4) and +(0.4,1.4) ..
+        node[translab,above]{pagamento recusado} (pen.north east);
+  \draw[trans] (pen.south) -- node[translab,left]{cancelar} (can.west);
+  \draw[trans] (con.south) -- node[translab,right]{cancelar [no prazo\\e sem entrada]\\/ revoga bilhete} (can.east);
+  \draw[thick] (6.5,-5.2) circle (0.2);
+  \fill (6.5,-5.2) circle (0.12);
+  \draw[trans] (can.south) -- (6.5,-5.0);
+\end{tikzpicture}}
+\caption{Diagrama de estados da inscrição (uma nova inscrição após
+cancelamento é uma nova instância)}
+\label{fig:estados-inscricao}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.9\textwidth}{!}{%
+\begin{tikzpicture}
+  \fill (0,0) circle (0.13);
+  \node[estado] (ras) at (3,0)   {rascunho};
+  \node[estado] (pub) at (8,0)   {publicado};
+  \node[estado] (ter) at (12.5,0) {terminado};
+  \node[estado] (can) at (5.5,-3) {cancelado};
+  \draw[trans] (0.13,0) -- node[translab,above]{criar} (ras);
+  \draw[trans] (ras) -- node[translab,above]{publicar} (pub);
+  \draw[trans] (pub) -- node[translab,above]{terminar} (ter);
+  \draw[trans] (ras.south) -- node[translab,left]{cancelar} (can.west);
+  \draw[trans] (pub.south) -- node[translab,right]{cancelar} (can.east);
+\end{tikzpicture}}
+\caption{Diagrama de estados do festival (independente do indicador
+\emph{ativo}, gerido pelo Administrador)}
+\label{fig:estados-festival}
+\end{figure}

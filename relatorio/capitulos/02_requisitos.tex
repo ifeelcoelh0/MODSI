@@ -1,0 +1,147 @@
+\chapter{Análise de Requisitos}
+
+\section{Definição de Atores}
+
+O sistema distingue cinco atores. Os quatro atores autenticados são
+especializações de um ator abstrato, o \emph{Utilizador Autenticado}, que
+reúne as funcionalidades comuns (iniciar e terminar sessão e editar o perfil).
+Cada conta tem um único perfil. O registo público cria sempre uma conta com
+perfil \emph{Participante}; os perfis \emph{Organizador}, \emph{Staff} e
+\emph{Administrador} são atribuídos pelo Administrador.
+
+\begin{table}[H]
+\centering
+\caption{Atores do sistema}
+\label{tab:atores}
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Ator} & \textbf{Descrição} \\ \hline
+Visitante & Utilizador não autenticado. Consulta a informação pública
+  (festivais publicados, programação, palcos e artistas) e pode registar uma
+  conta. \\ \hline
+\emph{Utilizador Autenticado} & Ator abstrato que generaliza os quatro perfis
+  seguintes. Inicia e termina sessão e edita os seus dados, palavra-passe e
+  idioma. \\ \hline
+Participante & Utilizador registado que se inscreve em festivais, efetua o
+  pagamento simulado, consulta as suas inscrições e bilhetes QR e cancela
+  inscrições dentro do prazo. \\ \hline
+Organizador & Responsável pelos festivais que cria: dados do festival, palcos,
+  artistas, programação, associação de membros do Staff e acompanhamento das
+  inscrições. \\ \hline
+Staff & Colaborador associado a um ou mais festivais pelo Organizador.
+  Consulta os participantes, verifica bilhetes e regista as entradas no
+  recinto. \\ \hline
+Administrador & Responsável pela gestão global da plataforma: contas,
+  perfis, ativação de festivais e indicadores globais. \\ \hline
+\end{tabularx}
+\end{table}
+
+\section{Requisitos Funcionais}
+
+A Tabela~\ref{tab:rf} lista os requisitos funcionais. A coluna \emph{UC}
+indica os casos de uso (Capítulo~\ref{cap:modelacao}) que concretizam cada
+requisito. A prioridade segue a classificação \emph{Alta} (indispensável para
+a demonstração) e \emph{Média} (a implementar se o tempo o permitir).
+
+\begin{longtable}{|l|p{8.6cm}|l|l|}
+\caption{Requisitos funcionais}\label{tab:rf}\\
+\hline
+\textbf{ID} & \textbf{O sistema deve permitir\dots} & \textbf{Prior.} & \textbf{UC} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{O sistema deve permitir\dots (cont.)} & \textbf{Prior.} & \textbf{UC} \\ \hline
+\endhead
+\multicolumn{4}{c}{\textbf{Visitante}} \\ \hline
+RF01 & listar os festivais publicados e ativos. & Alta & UC01 \\ \hline
+RF02 & pesquisar festivais pelo nome e filtrá-los por data e localização. & Média & UC02, UC03 \\ \hline
+RF03 & consultar os detalhes de um festival, incluindo programação, palcos e artistas. & Alta & UC04, UC05 \\ \hline
+RF04 & registar uma conta, que fica com o perfil Participante. & Alta & UC06 \\ \hline
+\multicolumn{4}{c}{\textbf{Utilizador Autenticado}} \\ \hline
+RF05 & iniciar e terminar sessão com email e palavra-passe (autenticação local). & Alta & UC07, UC08 \\ \hline
+RF06 & editar os dados pessoais, a palavra-passe e o idioma preferido. & Média & UC09 \\ \hline
+\multicolumn{4}{c}{\textbf{Participante}} \\ \hline
+RF07 & inscrever-se num festival, respeitando o período de inscrições e a lotação. & Alta & UC10 \\ \hline
+RF08 & efetuar um pagamento simulado, registando cada tentativa e o seu resultado. & Alta & UC11 \\ \hline
+RF09 & emitir automaticamente um bilhete com código QR único quando o pagamento é aprovado. & Alta & UC11, UC13 \\ \hline
+RF10 & consultar as suas inscrições e respetivos estados. & Alta & UC12 \\ \hline
+RF11 & cancelar uma inscrição até à data limite de cancelamento, revogando o bilhete. & Média & UC14 \\ \hline
+\multicolumn{4}{c}{\textbf{Organizador}} \\ \hline
+RF12 & criar e editar festivais (dados, datas, período de inscrições, capacidade e preço). & Alta & UC15, UC16 \\ \hline
+RF13 & alterar o estado de um festival (publicar, cancelar, terminar). & Alta & UC16 \\ \hline
+RF14 & gerir os palcos de um festival. & Alta & UC17 \\ \hline
+RF15 & gerir os artistas e a sua associação ao festival. & Alta & UC18 \\ \hline
+RF16 & gerir a programação (atuações), impedindo conflitos de horário no mesmo palco. & Alta & UC19 \\ \hline
+RF17 & associar e remover membros do Staff de um festival. & Alta & UC20 \\ \hline
+RF18 & consultar as inscrições do festival e respetivos indicadores (gráfico). & Média & UC21 \\ \hline
+\multicolumn{4}{c}{\textbf{Staff}} \\ \hline
+RF19 & consultar os festivais aos quais está associado. & Alta & UC22 \\ \hline
+RF20 & consultar e pesquisar os participantes inscritos num festival. & Alta & UC23 \\ \hline
+RF21 & verificar a validade de um bilhete através do código QR ou do código manual. & Alta & UC24 \\ \hline
+RF22 & registar a entrada de um participante, impedindo a reutilização do bilhete. & Alta & UC25 \\ \hline
+RF23 & consultar o histórico de entradas de um festival. & Média & UC26 \\ \hline
+\multicolumn{4}{c}{\textbf{Administrador}} \\ \hline
+RF24 & gerir contas de utilizador (criar, editar, ativar e desativar). & Alta & UC27 \\ \hline
+RF25 & atribuir e alterar o perfil de um utilizador. & Alta & UC28 \\ \hline
+RF26 & consultar todos os festivais e ativá-los ou desativá-los. & Alta & UC29, UC30 \\ \hline
+RF27 & consultar indicadores globais de inscrições e pagamentos (\emph{dashboard}). & Média & UC31 \\ \hline
+\end{longtable}
+
+\section{Requisitos Não Funcionais}
+
+Os requisitos não funcionais incluem os requisitos de implementação definidos
+no enunciado do trabalho.
+
+\begin{longtable}{|l|p{12.4cm}|}
+\caption{Requisitos não funcionais}\label{tab:rnf}\\
+\hline
+\textbf{ID} & \textbf{Requisito não funcional} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Requisito não funcional (cont.)} \\ \hline
+\endhead
+RNF01 & \textbf{Segurança:} autenticação local com sessão para todas as funcionalidades reservadas. \\ \hline
+RNF02 & \textbf{Segurança:} controlo de acesso por perfil e, para Organizador e Staff, pela associação ao festival. \\ \hline
+RNF03 & \textbf{Segurança:} palavras-passe guardadas apenas como \emph{hash} (\texttt{password\_hash}/bcrypt); consultas SQL parametrizadas (\emph{prepared statements}). \\ \hline
+RNF04 & \textbf{Arquitetura:} código organizado segundo o padrão MVC (\emph{Model-View-Controller}). \\ \hline
+RNF05 & \textbf{Dados:} base de dados relacional MySQL acedida por PDO, com chaves estrangeiras, restrições de unicidade, vistas e transações. \\ \hline
+RNF06 & \textbf{Interatividade:} pesquisa, filtros e validação de bilhetes efetuados por AJAX, sem recarregar a página. \\ \hline
+RNF07 & \textbf{Usabilidade:} interface responsiva (computador, \emph{tablet} e telemóvel) com Bootstrap. \\ \hline
+RNF08 & \textbf{Usabilidade:} interface multilingue, pelo menos em Português e Inglês. \\ \hline
+RNF09 & \textbf{Usabilidade:} mensagens claras de sucesso e de erro em todas as operações. \\ \hline
+RNF10 & \textbf{Integridade:} impedir inscrições duplicadas e a reutilização de um bilhete, ao nível da base de dados. \\ \hline
+RNF11 & \textbf{Integridade:} pagamentos simulados, sem movimentação de dinheiro real. \\ \hline
+RNF12 & \textbf{Desempenho:} listagens com paginação e índices nas colunas de pesquisa. \\ \hline
+RNF13 & \textbf{Compatibilidade:} funcionamento nos navegadores modernos (Chrome, Firefox, Edge, Safari). \\ \hline
+RNF14 & \textbf{Gestão:} controlo de versões com Git/GitHub e acompanhamento das tarefas num quadro Kanban/Jira. \\ \hline
+\end{longtable}
+
+\section{Regras de Negócio}
+\label{sec:regras}
+
+As regras seguintes clarificam o comportamento do sistema e são a referência
+comum para os cenários (Capítulo~\ref{cap:modelacao}) e para o modelo de dados
+(Capítulo~\ref{cap:bd}).
+
+\begin{longtable}{|l|p{12.4cm}|}
+\caption{Regras de negócio}\label{tab:rn}\\
+\hline
+\textbf{ID} & \textbf{Regra} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Regra (cont.)} \\ \hline
+\endhead
+RN01 & Cada utilizador tem um único perfil. O registo público cria contas com perfil Participante; os restantes perfis são atribuídos pelo Administrador. \\ \hline
+RN02 & Uma conta desativada não pode iniciar sessão. \\ \hline
+RN03 & Um festival só é visível ao público se estiver no estado \emph{publicado} e ativo. O \textbf{estado} é gerido pelo Organizador (rascunho, publicado, cancelado, terminado); o indicador \textbf{ativo} é gerido pelo Administrador. \\ \hline
+RN04 & O Organizador só gere os festivais que criou. \\ \hline
+RN05 & Só é possível inscrever-se num festival publicado e ativo, entre as datas de abertura e de fecho das inscrições, e enquanto o número de inscrições confirmadas for inferior à capacidade. \\ \hline
+RN06 & Cada participante tem no máximo uma inscrição \emph{não cancelada} por festival. Depois de cancelar, pode inscrever-se de novo, o que cria uma nova inscrição; a cancelada fica como histórico, com o respetivo pagamento e bilhete revogado. \\ \hline
+RN07 & O valor da inscrição é o preço do festival no momento da inscrição; alterações posteriores do preço não afetam inscrições existentes. \\ \hline
+RN08 & Uma inscrição pendente pode ter várias tentativas de pagamento, mas no máximo uma aprovada. A aprovação confirma a inscrição e emite o bilhete numa única transação. \\ \hline
+RN09 & Cada inscrição confirmada tem exatamente um bilhete, com um código QR único e não previsível. \\ \hline
+RN10 & O cancelamento só é permitido até à data limite de cancelamento e se ainda não existir entrada registada. O bilhete é revogado. Não existe reembolso (pagamentos simulados). \\ \hline
+RN11 & Um bilhete é válido para entrada se não estiver revogado, a inscrição estiver confirmada, o festival decorrer nessa data e o bilhete ainda não tiver sido usado. Cada bilhete permite uma única entrada. \\ \hline
+RN12 & O Staff só consulta e valida bilhetes dos festivais a que está associado com associação ativa. Remover um membro do Staff desativa a associação, mantendo o histórico. \\ \hline
+RN13 & Uma atuação pertence a um artista associado ao festival e a um palco do mesmo festival, decorre dentro das datas do festival e não se sobrepõe a outra atuação no mesmo palco. \\ \hline
+RN14 & Não é possível remover um palco ou desassociar um artista que tenham atuações marcadas. \\ \hline
+\end{longtable}

@@ -1,0 +1,129 @@
+% =====================================================================
+%  Relatório MODSI — Sistema de Gestão de Festivais
+%  Compilar com pdfLaTeX (ex.: Overleaf). Ficheiro principal: main.tex
+% =====================================================================
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,calc,babel}
+\usepackage[hidelinks]{hyperref}
+
+\addto\captionsportuguese{\renewcommand{\contentsname}{Índice}}
+
+% ---------- Cabeçalho ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape\leftmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter. #1}{}}
+
+% ---------- Nota de trabalho por fazer (remover antes da entrega) ----------
+\newcommand{\pendente}[1]{%
+  \par\noindent\fcolorbox{red!70!black}{red!5}{%
+  \parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\small\color{red!60!black}%
+  \textbf{A completar:} #1}}\par\medskip}
+
+% ---------- Cenários de casos de uso ----------
+% \cenario{UCxx}{Nome}{Ator}{Pré-condição}{Fluxo principal}{Pós-condição}{Alternativos}
+\newcommand{\cenario}[7]{%
+  \par\noindent
+  \begin{tabularx}{\textwidth}{|>{\bfseries}p{3.1cm}|X|}
+    \hline
+    \multicolumn{2}{|l|}{\textbf{#1 -- #2}}\\ \hline
+    Ator            & #3 \\ \hline
+    Pré-condição    & #4 \\ \hline
+    Fluxo principal & #5 \\ \hline
+    Pós-condição    & #6 \\ \hline
+    Alternativos    & #7 \\ \hline
+  \end{tabularx}\par\medskip}
+
+% ---------- Estilos TikZ ----------
+\tikzset{
+  uc/.style={ellipse, draw, fill=blue!8, minimum width=5.6cm,
+             minimum height=0.85cm, font=\footnotesize, align=center, inner sep=1pt},
+  sistema/.style={draw, thick, rounded corners=2pt},
+  assoc/.style={thin},
+  relacao/.style={dashed, -{Stealth[length=2mm]}, thin},
+  relnome/.style={font=\scriptsize, right, align=left},
+  general/.style={-{Triangle[open,length=3mm,width=3mm]}, thin},
+  estado/.style={draw, rounded corners=6pt, fill=blue!8, minimum width=2.6cm,
+                 minimum height=0.9cm, font=\small},
+  trans/.style={-{Stealth[length=2mm]}, thin},
+  translab/.style={font=\scriptsize, align=center},
+}
+\newcommand{\incl}{\guillemotleft include\guillemotright}
+\newcommand{\extd}{\guillemotleft extend\guillemotright}
+
+% Ator UML: \ator{nome-coordenada}{posição}{rótulo}
+\newcommand{\ator}[3]{%
+  \begin{scope}[shift={(#2)}]
+    \draw[thick] (0,0.62) circle (0.17);
+    \draw[thick] (0,0.45) -- (0,-0.1);
+    \draw[thick] (-0.32,0.28) -- (0.32,0.28);
+    \draw[thick] (0,-0.1) -- (-0.27,-0.55);
+    \draw[thick] (0,-0.1) -- (0.27,-0.55);
+    \node[below, font=\small, align=center] at (0,-0.55) {#3};
+    \coordinate (#1) at (0.35,0.15);
+    \coordinate (#1-left) at (-0.35,0.15);
+    \coordinate (#1-top) at (0,0.8);
+    \coordinate (#1-bottom) at (0,-1.0);
+  \end{scope}}
+
+\begin{document}
+
+% =====================================================================
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+  {\Large Modelação e Simulação Industrial\par}
+  \vspace{4cm}
+  \rule{\textwidth}{0.4pt}\par\vspace{0.6cm}
+  {\LARGE Sistema de Gestão de Festivais\par}
+  \vspace{0.6cm}\rule{\textwidth}{0.4pt}\par
+  \vspace{1.5cm}
+  {\large Grupo \textbf{XX}\par\vspace{0.3cm}
+   Nome Apelido -- 12XXXXX\\
+   Nome Apelido -- 12XXXXX\\
+   Nome Apelido -- 12XXXXX\par}
+  \vspace{1.0cm}
+  {\large Docente: Nome do Docente\par}
+  \vfill
+  \IfFileExists{isep_logo.png}{\includegraphics[width=6cm]{isep_logo.png}\par\vspace{1cm}}{}
+  Mestrado em Engenharia Eletrotécnica e de Computadores\\[0.2cm]
+  Departamento de Engenharia Eletrotécnica\\[0.6cm]
+  Ano letivo 2026/2027
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+\pagenumbering{arabic}
+
+\input{capitulos/01_introducao}
+\input{capitulos/02_requisitos}
+\input{capitulos/03_modelacao}
+\input{capitulos/04_base_dados}
+\input{capitulos/05_interface}
+\input{capitulos/06_implementacao}
+\input{capitulos/07_testes}
+\input{capitulos/08_conclusao}
+
+\appendix
+\input{capitulos/anexos}
+
+\end{document}

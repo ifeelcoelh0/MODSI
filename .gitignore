@@ -1,0 +1,22 @@
+# Configuração local com palavras-passe (usar config.exemplo.php / config.servidor.exemplo.php)
+festivais/app/config/config.php
+
+# Ficheiros do Windows
+*:Zone.Identifier
+*Zone.Identifier
+Thumbs.db
+desktop.ini
+
+# LaTeX (temporários)
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Python
+__pycache__/

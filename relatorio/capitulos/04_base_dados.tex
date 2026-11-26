@@ -1,0 +1,281 @@
+\chapter{Base de Dados}
+\label{cap:bd}
+
+% ---------- Macros locais do diagrama ER ----------
+% \entidade{nome-nó}{posição do topo}{título}{linhas: chave & coluna & tipo \\}
+\newcommand{\entidade}[4]{%
+  \node[draw, thick, fill=white, inner sep=0pt, anchor=north, font=\scriptsize]
+    (#1) at (#2)
+    {\begin{tabular}{@{\,}l@{\;\;}l@{\;\;}l@{\,}}
+       \multicolumn{3}{c}{\rule{0pt}{2.6ex}\small\textbf{#3}}\\[0.4ex] \hline
+       #4
+     \end{tabular}};}
+% \relER{origem}{destino}{nome}{cardinalidade origem}{cardinalidade destino}
+\newcommand{\relER}[5]{%
+  \draw[thin] (#1) --
+    node[pos=0.5, fill=white, inner sep=1pt, font=\scriptsize\itshape]{#3}
+    node[pos=0.1, auto, font=\scriptsize\bfseries]{#4}
+    node[pos=0.9, auto, font=\scriptsize\bfseries]{#5} (#2);}
+
+\section{Modelo Entidade--Relação}
+
+O modelo de dados tem doze tabelas. As decisões principais são:
+\begin{itemize}
+  \item \textbf{perfil} é uma tabela (e não um tipo enumerado) para permitir
+        descrições e acrescentar perfis sem alterar a estrutura;
+  \item \textbf{artista} é um catálogo partilhado; a ligação aos festivais é
+        de muitos-para-muitos através de \textbf{festival\_artista};
+  \item uma \textbf{atuacao} referencia o par festival--artista e o par
+        palco--festival, o que garante ao nível da base de dados que o artista
+        e o palco pertencem ao mesmo festival (RN13);
+  \item \textbf{pagamento} é separado da inscrição para registar todas as
+        tentativas (aprovadas e recusadas), mas só uma pode ser aprovada
+        (RN08);
+  \item \textbf{bilhete} é separado da inscrição porque só existe depois da
+        aprovação do pagamento e pode ser revogado (RN09, RN10);
+  \item \textbf{entrada} tem no máximo um registo por bilhete, o que impede a
+        reutilização (RN11);
+  \item a associação do Staff (\textbf{festival\_staff}) é desativada e não
+        apagada, para manter o histórico das entradas validadas (RN12).
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}
+  % ---- Linha A ----
+  \entidade{perfil}{0,0}{perfil}{%
+    PK & codigo & VARCHAR(20)\\
+       & descricao & VARCHAR(100)\\}
+  \entidade{utilizador}{6.5,0}{utilizador}{%
+    PK & id\_utilizador & BIGINT\\
+       & nome & VARCHAR(120)\\
+    UK & email & VARCHAR(254)\\
+       & password\_hash & VARCHAR(255)\\
+    FK & perfil\_codigo & VARCHAR(20)\\
+       & idioma & CHAR(2)\\
+       & ativo & BOOLEAN\\
+       & criado\_em & DATETIME\\}
+  \entidade{fstaff}{13.5,0}{festival\_staff}{%
+    PK,FK & id\_festival & BIGINT\\
+    PK,FK & id\_utilizador & BIGINT\\
+          & associado\_em & DATETIME\\
+          & ativo & BOOLEAN\\}
+  % ---- Linha B ----
+  \entidade{inscricao}{0,-5.5}{inscricao}{%
+    PK & id\_inscricao & BIGINT\\
+    FK & id\_participante & BIGINT\\
+    FK & id\_festival & BIGINT\\
+       & estado & ENUM\\
+       & valor & DECIMAL(10,2)\\
+       & criada\_em & DATETIME\\
+       & confirmada\_em & DATETIME\\
+       & cancelada\_em & DATETIME\\
+    UK & id\_festival\_ativa & BIGINT (gerada)\\}
+  \entidade{festival}{6.5,-5.5}{festival}{%
+    PK & id\_festival & BIGINT\\
+    FK & id\_organizador & BIGINT\\
+       & nome & VARCHAR(160)\\
+       & descricao & TEXT\\
+       & localizacao & VARCHAR(200)\\
+       & data\_inicio & DATE\\
+       & data\_fim & DATE\\
+       & inscricoes\_abrem & DATETIME\\
+       & inscricoes\_fecham & DATETIME\\
+       & cancelamento\_ate & DATETIME\\
+       & capacidade & INT\\
+       & preco & DECIMAL(10,2)\\
+       & estado & ENUM\\
+       & ativo & BOOLEAN\\
+       & criado\_em & DATETIME\\}
+  \entidade{fartista}{13.5,-5.5}{festival\_artista}{%
+    PK,FK & id\_festival & BIGINT\\
+    PK,FK & id\_artista & BIGINT\\}
+  \entidade{artista}{19.5,-5.5}{artista}{%
+    PK & id\_artista & BIGINT\\
+       & nome & VARCHAR(160)\\
+       & genero & VARCHAR(80)\\
+       & biografia & TEXT\\}
+  % ---- Linha C ----
+  \entidade{pagamento}{-3,-14}{pagamento}{%
+    PK & id\_pagamento & BIGINT\\
+    FK & id\_inscricao & BIGINT\\
+       & metodo & ENUM\\
+       & resultado & ENUM\\
+       & valor & DECIMAL(10,2)\\
+       & criado\_em & DATETIME\\
+    UK & inscricao\_aprovada & BIGINT (gerada)\\}
+  \entidade{bilhete}{3,-14}{bilhete}{%
+    PK & id\_bilhete & BIGINT\\
+    FK,UK & id\_inscricao & BIGINT\\
+    UK & codigo\_qr & CHAR(64)\\
+       & emitido\_em & DATETIME\\
+       & revogado\_em & DATETIME\\}
+  \entidade{palco}{9.5,-14}{palco}{%
+    PK & id\_palco & BIGINT\\
+    FK & id\_festival & BIGINT\\
+       & nome & VARCHAR(100)\\}
+  \entidade{atuacao}{16,-14}{atuacao}{%
+    PK & id\_atuacao & BIGINT\\
+    FK & id\_festival & BIGINT\\
+    FK & id\_palco & BIGINT\\
+    FK & id\_artista & BIGINT\\
+       & inicio & DATETIME\\
+       & fim & DATETIME\\}
+  % ---- Linha D ----
+  \entidade{entrada}{3,-19}{entrada}{%
+    PK & id\_entrada & BIGINT\\
+    FK,UK & id\_bilhete & BIGINT\\
+    FK & id\_staff & BIGINT\\
+       & validada\_em & DATETIME\\}
+
+  % ---- Relações ----
+  \relER{perfil.east}{utilizador.west}{classifica}{1}{N}
+  \relER{utilizador.east}{fstaff.west}{trabalha\_em}{1}{N}
+  \relER{fstaff.south}{festival.north east}{tem\_staff}{N}{1}
+  \relER{utilizador.south}{festival.north}{organiza}{1}{N}
+  \relER{utilizador.south west}{inscricao.north east}{faz}{1}{N}
+  \relER{festival.west}{inscricao.east}{recebe}{1}{N}
+  \relER{festival.east}{fartista.west}{associa}{1}{N}
+  \relER{artista.west}{fartista.east}{participa}{1}{N}
+  \relER{festival.south}{palco.north}{tem}{1}{N}
+  \relER{palco.east}{atuacao.west}{acolhe}{1}{N}
+  \relER{fartista.south}{atuacao.north}{programa}{1}{N}
+  \relER{inscricao.south west}{pagamento.north}{tem}{1}{N}
+  \relER{inscricao.south east}{bilhete.north}{emite}{1}{0..1}
+  \relER{bilhete.south}{entrada.north}{origina}{1}{0..1}
+  % utilizador (Staff) valida entrada: percurso pela esquerda
+  \coordinate (cantoValida) at ($(entrada.west)+(-7.8,0)$);
+  \draw[thin] (utilizador.north) -- ++(0,1) -| (cantoValida) -- (entrada.west);
+  \node[fill=white, inner sep=1pt, font=\scriptsize\itshape, rotate=90]
+    at ($(cantoValida)+(0,11)$) {valida};
+  \node[font=\scriptsize\bfseries] at ($(utilizador.north)+(0.25,0.35)$) {1};
+  \node[font=\scriptsize\bfseries] at ($(entrada.west)+(-0.35,0.25)$) {N};
+\end{tikzpicture}}
+\caption{Modelo entidade--relação (PK: chave primária; FK: chave estrangeira;
+UK: valor único)}
+\label{fig:er}
+\end{figure}
+
+\section{Modelo Relacional}
+
+No esquema seguinte, as chaves primárias estão \underline{sublinhadas} e as
+chaves estrangeiras estão em \textit{itálico}, com a tabela referenciada
+indicada por $\rightarrow$.
+
+\begin{itemize}\small
+  \item \textbf{perfil}(\underline{codigo}, descricao)
+  \item \textbf{utilizador}(\underline{id\_utilizador}, nome, email, password\_hash,
+        \textit{perfil\_codigo}$\rightarrow$perfil, idioma, ativo, criado\_em)
+  \item \textbf{festival}(\underline{id\_festival}, \textit{id\_organizador}$\rightarrow$utilizador,
+        nome, descricao, localizacao, data\_inicio, data\_fim, inscricoes\_abrem,
+        inscricoes\_fecham, cancelamento\_ate, capacidade, preco, estado, ativo,
+        criado\_em)
+  \item \textbf{festival\_staff}(\underline{\textit{id\_festival}}$\rightarrow$festival,
+        \underline{\textit{id\_utilizador}}$\rightarrow$utilizador, associado\_em, ativo)
+  \item \textbf{artista}(\underline{id\_artista}, nome, genero, biografia)
+  \item \textbf{festival\_artista}(\underline{\textit{id\_festival}}$\rightarrow$festival,
+        \underline{\textit{id\_artista}}$\rightarrow$artista)
+  \item \textbf{palco}(\underline{id\_palco}, \textit{id\_festival}$\rightarrow$festival, nome)
+  \item \textbf{atuacao}(\underline{id\_atuacao}, \textit{id\_festival}, \textit{id\_palco},
+        \textit{id\_artista}, inicio, fim), com
+        (\textit{id\_festival}, \textit{id\_artista})$\rightarrow$festival\_artista e
+        (\textit{id\_palco}, \textit{id\_festival})$\rightarrow$palco
+  \item \textbf{inscricao}(\underline{id\_inscricao}, \textit{id\_participante}$\rightarrow$utilizador,
+        \textit{id\_festival}$\rightarrow$festival, estado, valor, criada\_em,
+        confirmada\_em, cancelada\_em, id\_festival\_ativa)
+  \item \textbf{pagamento}(\underline{id\_pagamento}, \textit{id\_inscricao}$\rightarrow$inscricao,
+        metodo, resultado, valor, criado\_em, inscricao\_aprovada)
+  \item \textbf{bilhete}(\underline{id\_bilhete}, \textit{id\_inscricao}$\rightarrow$inscricao,
+        codigo\_qr, emitido\_em, revogado\_em)
+  \item \textbf{entrada}(\underline{id\_entrada}, \textit{id\_bilhete}$\rightarrow$bilhete,
+        \textit{id\_staff}$\rightarrow$utilizador, validada\_em)
+\end{itemize}
+
+\noindent Domínios dos tipos enumerados:
+\begin{itemize}\small
+  \item \texttt{perfil.codigo}: PARTICIPANTE, ORGANIZADOR, STAFF, ADMIN;
+  \item \texttt{festival.estado}: rascunho, publicado, cancelado, terminado;
+  \item \texttt{inscricao.estado}: pendente, confirmada, cancelada;
+  \item \texttt{pagamento.metodo}: cartao, mbway, multibanco;
+        \texttt{pagamento.resultado}: aprovado, recusado;
+  \item \texttt{utilizador.idioma}: pt, en.
+\end{itemize}
+
+\section{Restrições de Integridade}
+
+A Tabela~\ref{tab:integridade} relaciona as restrições da base de dados com
+as regras de negócio que garantem. As regras que não se podem exprimir apenas
+com chaves e restrições (por exemplo, a sobreposição de atuações) são
+verificadas na aplicação, dentro de uma transação, ou por \emph{trigger}.
+
+\begin{longtable}{|p{6.0cm}|p{6.0cm}|l|}
+\caption{Restrições de integridade}\label{tab:integridade}\\
+\hline
+\textbf{Restrição} & \textbf{Objetivo} & \textbf{Regra} \\ \hline
+\endfirsthead
+\hline
+\textbf{Restrição} & \textbf{Objetivo (cont.)} & \textbf{Regra} \\ \hline
+\endhead
+UNIQUE \texttt{utilizador(email)} & Uma conta por email. & RN01 \\ \hline
+CHECK em \texttt{festival}: \texttt{data\_fim >= data\_inicio},
+  \texttt{inscricoes\_fecham > inscricoes\_abrem}, \texttt{capacidade > 0},
+  \texttt{preco >= 0} & Dados do festival coerentes. & -- \\ \hline
+Coluna gerada \texttt{id\_festival\_ativa} = \texttt{id\_festival} se a
+  inscrição não está cancelada, senão NULL; UNIQUE
+  \texttt{(id\_participante, id\_festival\_ativa)} & No máximo uma inscrição
+  não cancelada por participante e festival; as canceladas ficam como
+  histórico. & RN06 \\ \hline
+Coluna gerada \texttt{inscricao\_aprovada} = \texttt{id\_inscricao} se
+  \texttt{resultado = 'aprovado'}, senão NULL; UNIQUE & No máximo um pagamento
+  aprovado por inscrição (os NULL não colidem). & RN08 \\ \hline
+UNIQUE \texttt{bilhete(id\_inscricao)} e \texttt{bilhete(codigo\_qr)} & Um
+  bilhete por inscrição e código QR único. & RN09 \\ \hline
+UNIQUE \texttt{entrada(id\_bilhete)} & Cada bilhete só dá uma entrada, mesmo
+  com leituras simultâneas. & RN11 \\ \hline
+UNIQUE \texttt{palco(id\_festival, nome)} e \texttt{palco(id\_palco,
+  id\_festival)} & Nomes de palco únicos por festival; suporte à chave
+  estrangeira composta. & RN13 \\ \hline
+FK \texttt{atuacao(id\_festival, id\_artista)} $\rightarrow$
+  \texttt{festival\_artista}; FK \texttt{atuacao(id\_palco, id\_festival)}
+  $\rightarrow$ \texttt{palco}; CHECK \texttt{fim > inicio} & Artista e palco
+  do mesmo festival; horário válido. & RN13 \\ \hline
+ON DELETE RESTRICT nas chaves que referenciam \texttt{palco} e
+  \texttt{festival\_artista} & Não remover palcos ou artistas com atuações.
+  & RN14 \\ \hline
+Verificação na aplicação ou por \emph{trigger} & Sem sobreposição de
+  atuações no mesmo palco; atuação dentro das datas do festival. & RN13 \\ \hline
+Verificação na aplicação & O Staff que valida está associado ao festival do
+  bilhete; o organizador é o responsável pelo festival. & RN04, RN12 \\ \hline
+\end{longtable}
+
+\noindent Operações executadas em \textbf{transação}:
+\begin{itemize}
+  \item pagamento aprovado: inserir \texttt{pagamento}, confirmar a
+        \texttt{inscricao} e inserir o \texttt{bilhete} (com nova verificação
+        da lotação);
+  \item cancelamento: atualizar a \texttt{inscricao} e revogar o
+        \texttt{bilhete};
+  \item validação de entrada: verificar o bilhete e inserir a
+        \texttt{entrada}.
+\end{itemize}
+
+\noindent \textbf{Vistas} previstas: \texttt{vw\_festivais\_publicos},
+\texttt{vw\_programacao}, \texttt{vw\_ocupacao\_festival} (confirmadas,
+capacidade e entradas por festival) e \texttt{vw\_indicadores\_globais}.
+
+\noindent O \texttt{codigo\_qr} é gerado com 32 \emph{bytes} aleatórios
+criptograficamente seguros, representados em hexadecimal (64 caracteres), para
+não ser previsível.
+
+\section{Criação da Base de Dados e Dados de Exemplo}
+
+\pendente{Descrever os scripts da pasta \texttt{bd/} (esquema, vistas e
+procedimentos, dados de exemplo, testes) e referir o \emph{dump} entregue.}
+
+\section{Queries SQL}
+
+\pendente{Principais consultas por caso de uso (por exemplo: festivais
+públicos com filtros (UC01--UC03), programação (UC05), inscrições do
+participante (UC12), verificação de bilhete (UC24), ocupação e indicadores
+(UC21, UC31)).}
